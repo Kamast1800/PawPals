@@ -1,0 +1,14 @@
+# Node and environment
+node_modules/
+.env
+.env.*
+.DS_Store
+
+# Build artifacts
+/dist/
+/build/
+/.next/
+/coverage/
+/.vite/
+/.turbo/
+/.parcel-cache/
