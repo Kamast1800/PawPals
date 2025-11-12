@@ -1,0 +1,1076 @@
+openapi: 3.0.3
+info:
+  title: PawPals API
+  version: 1.0.0
+  description: |
+    REST API for the PawPals mobile app. The frontend must not access the database
+    or Supabase directly; all data access goes through this API layer.
+    Provides CRUD operations for profiles, dogs, matches, playdates, ratings, and messages.
+
+servers:
+  - url: https://api.pawpals.example.com/v1
+    description: Production server (example)
+  - url: http://localhost:4000/v1
+    description: Local dev server
+
+tags:
+  - name: Profiles
+    description: User profiles (linked 1:1 to auth.users)
+  - name: Dogs
+    description: Dog profiles owned by users
+  - name: Matches
+    description: Matches between two dogs
+  - name: Playdates
+    description: Scheduled playdates between matched dogs
+  - name: Ratings
+    description: Ratings and reviews of playdates
+  - name: Messages
+    description: Chat messages between matched dog owners
+
+paths:
+  /profiles/me:
+    get:
+      tags: [Profiles]
+      summary: Get current user's profile
+      operationId: getMyProfile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user's profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Profile not found
+
+  /profiles:
+    post:
+      tags: [Profiles]
+      summary: Create or upsert current user's profile
+      description: |
+        Creates a profile for the authenticated user. The `id` is taken from
+        the authenticated user (auth.users.id); the client does not supply it.
+      operationId: createProfile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileCreate'
+      responses:
+        '201':
+          description: Created profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /profiles/{userId}:
+    get:
+      tags: [Profiles]
+      summary: Get profile by user ID
+      operationId: getProfileById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '200':
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Profile not found
+    patch:
+      tags: [Profiles]
+      summary: Update profile
+      operationId: updateProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProfileUpdate'
+      responses:
+        '200':
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Profile not found
+    delete:
+      tags: [Profiles]
+      summary: Delete profile
+      operationId: deleteProfile
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserIdParam'
+      responses:
+        '204':
+          description: Profile deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /dogs:
+    get:
+      tags: [Dogs]
+      summary: List dogs
+      operationId: listDogs
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: ownerId
+          schema:
+            type: string
+            format: uuid
+          required: false
+          description: Filter by owner (auth.users.id)
+      responses:
+        '200':
+          description: List of dogs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Dogs]
+      summary: Create a dog
+      operationId: createDog
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DogCreate'
+      responses:
+        '201':
+          description: Created dog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /dogs/{dogId}:
+    get:
+      tags: [Dogs]
+      summary: Get a dog by ID
+      operationId: getDogById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DogIdParam'
+      responses:
+        '200':
+          description: Dog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dog'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Dog not found
+    patch:
+      tags: [Dogs]
+      summary: Update a dog
+      operationId: updateDog
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DogIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DogUpdate'
+      responses:
+        '200':
+          description: Updated dog
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dog'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Dog not found
+    delete:
+      tags: [Dogs]
+      summary: Delete a dog
+      operationId: deleteDog
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/DogIdParam'
+      responses:
+        '204':
+          description: Dog deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /matches:
+    get:
+      tags: [Matches]
+      summary: List matches for current user
+      description: Returns matches where the user owns either dog in the pair.
+      operationId: listMatches
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Match'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Matches]
+      summary: Create a match between two dogs
+      operationId: createMatch
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchCreate'
+      responses:
+        '201':
+          description: Created match
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /matches/{matchId}:
+    get:
+      tags: [Matches]
+      summary: Get a match by ID
+      operationId: getMatchById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchIdParam'
+      responses:
+        '200':
+          description: Match
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Match not found
+    patch:
+      tags: [Matches]
+      summary: Update a match (e.g., status)
+      operationId: updateMatch
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchUpdate'
+      responses:
+        '200':
+          description: Updated match
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Match'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Match not found
+    delete:
+      tags: [Matches]
+      summary: Delete a match
+      description: Cascades to playdates, ratings, and messages due to foreign keys.
+      operationId: deleteMatch
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchIdParam'
+      responses:
+        '204':
+          description: Match deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /playdates:
+    get:
+      tags: [Playdates]
+      summary: List playdates for current user
+      description: Includes playdates where the user owns one of the dogs in the match.
+      operationId: listPlaydates
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of playdates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Playdate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Playdates]
+      summary: Create a playdate for a match
+      operationId: createPlaydate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaydateCreate'
+      responses:
+        '201':
+          description: Created playdate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Playdate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /playdates/{playdateId}:
+    get:
+      tags: [Playdates]
+      summary: Get a playdate by ID
+      operationId: getPlaydateById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlaydateIdParam'
+      responses:
+        '200':
+          description: Playdate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Playdate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Playdate not found
+    patch:
+      tags: [Playdates]
+      summary: Update a playdate
+      operationId: updatePlaydate
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlaydateIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlaydateUpdate'
+      responses:
+        '200':
+          description: Updated playdate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Playdate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Playdate not found
+    delete:
+      tags: [Playdates]
+      summary: Delete a playdate
+      operationId: deletePlaydate
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlaydateIdParam'
+      responses:
+        '204':
+          description: Playdate deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /ratings:
+    get:
+      tags: [Ratings]
+      summary: List ratings for current user
+      description: Returns ratings authored by the current user.
+      operationId: listRatings
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of ratings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rating'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [Ratings]
+      summary: Create a rating for a playdate
+      operationId: createRating
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingCreate'
+      responses:
+        '201':
+          description: Created rating
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /ratings/{ratingId}:
+    get:
+      tags: [Ratings]
+      summary: Get a rating by ID
+      operationId: getRatingById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RatingIdParam'
+      responses:
+        '200':
+          description: Rating
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Rating not found
+    patch:
+      tags: [Ratings]
+      summary: Update a rating
+      operationId: updateRating
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RatingIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RatingUpdate'
+      responses:
+        '200':
+          description: Updated rating
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rating'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Rating not found
+    delete:
+      tags: [Ratings]
+      summary: Delete a rating
+      operationId: deleteRating
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/RatingIdParam'
+      responses:
+        '204':
+          description: Rating deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /matches/{matchId}/messages:
+    get:
+      tags: [Messages]
+      summary: List messages for a match
+      operationId: listMessagesForMatch
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchIdParam'
+      responses:
+        '200':
+          description: List of messages for this match
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags: [Messages]
+      summary: Send a message in a match
+      operationId: createMessage
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MatchIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+      responses:
+        '201':
+          description: Created message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+  /messages/{messageId}:
+    get:
+      tags: [Messages]
+      summary: Get a message by ID
+      operationId: getMessageById
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MessageIdParam'
+      responses:
+        '200':
+          description: Message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          description: Message not found
+    delete:
+      tags: [Messages]
+      summary: Delete a message
+      operationId: deleteMessage
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/MessageIdParam'
+      responses:
+        '204':
+          description: Message deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    UserIdParam:
+      in: path
+      name: userId
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: ID from auth.users / profiles.id
+    DogIdParam:
+      in: path
+      name: dogId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    MatchIdParam:
+      in: path
+      name: matchId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    PlaydateIdParam:
+      in: path
+      name: playdateId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    RatingIdParam:
+      in: path
+      name: ratingId
+      required: true
+      schema:
+        type: string
+        format: uuid
+    MessageIdParam:
+      in: path
+      name: messageId
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Unauthorized – missing or invalid token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Forbidden – user not allowed to access this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+  schemas:
+    Profile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+          nullable: true
+        email_verified:
+          type: boolean
+          nullable: true
+        join_date:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required: [id, created_at, updated_at]
+
+    ProfileCreate:
+      type: object
+      properties:
+        full_name:
+          type: string
+        email_verified:
+          type: boolean
+      required: [full_name]
+
+    ProfileUpdate:
+      type: object
+      properties:
+        full_name:
+          type: string
+        email_verified:
+          type: boolean
+
+    Dog:
+      type: object
+      properties:
+        dog_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        breed:
+          type: string
+        age:
+          type: integer
+          minimum: 0
+        vax_status:
+          type: string
+          nullable: true
+        spay_neuter_status:
+          type: string
+          nullable: true
+        photo_count:
+          type: integer
+          minimum: 3
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - dog_id
+        - user_id
+        - name
+        - breed
+        - age
+        - photo_count
+        - created_at
+        - updated_at
+
+    DogCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        breed:
+          type: string
+        age:
+          type: integer
+          minimum: 0
+        vax_status:
+          type: string
+        spay_neuter_status:
+          type: string
+        photo_count:
+          type: integer
+          minimum: 3
+      required:
+        - name
+        - breed
+        - age
+        - photo_count
+
+    DogUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        breed:
+          type: string
+        age:
+          type: integer
+          minimum: 0
+        vax_status:
+          type: string
+        spay_neuter_status:
+          type: string
+        photo_count:
+          type: integer
+          minimum: 3
+
+    Match:
+      type: object
+      properties:
+        match_id:
+          type: string
+          format: uuid
+        dog1_id:
+          type: string
+          format: uuid
+        dog2_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          description: Match status (e.g., pending, confirmed, blocked)
+      required:
+        - match_id
+        - dog1_id
+        - dog2_id
+        - created_at
+        - status
+
+    MatchCreate:
+      type: object
+      properties:
+        dog1_id:
+          type: string
+          format: uuid
+        dog2_id:
+          type: string
+          format: uuid
+      required:
+        - dog1_id
+        - dog2_id
+
+    MatchUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+
+    Playdate:
+      type: object
+      properties:
+        playdate_id:
+          type: string
+          format: uuid
+        match_id:
+          type: string
+          format: uuid
+        scheduled_time:
+          type: string
+          format: date-time
+        location:
+          type: string
+        confirmed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - playdate_id
+        - match_id
+        - scheduled_time
+        - location
+        - confirmed
+        - created_at
+        - updated_at
+
+    PlaydateCreate:
+      type: object
+      properties:
+        match_id:
+          type: string
+          format: uuid
+        scheduled_time:
+          type: string
+          format: date-time
+        location:
+          type: string
+      required:
+        - match_id
+        - scheduled_time
+        - location
+
+    PlaydateUpdate:
+      type: object
+      properties:
+        scheduled_time:
+          type: string
+          format: date-time
+        location:
+          type: string
+        confirmed:
+          type: boolean
+
+    Rating:
+      type: object
+      properties:
+        rating_id:
+          type: string
+          format: uuid
+        playdate_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        stars:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - rating_id
+        - playdate_id
+        - user_id
+        - stars
+        - created_at
+        - updated_at
+
+    RatingCreate:
+      type: object
+      properties:
+        playdate_id:
+          type: string
+          format: uuid
+        stars:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+      required:
+        - playdate_id
+        - stars
+
+    RatingUpdate:
+      type: object
+      properties:
+        stars:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+
+    Message:
+      type: object
+      properties:
+        message_id:
+          type: string
+          format: uuid
+        match_id:
+          type: string
+          format: uuid
+        sender_id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+      required:
+        - message_id
+        - match_id
+        - sender_id
+        - content
+        - sent_at
+
+    MessageCreate:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Something went wrong
+        details:
+          type: object
+          additionalProperties: true

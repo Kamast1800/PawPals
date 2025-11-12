@@ -1,0 +1,24 @@
+{
+  "name": "pawpals",
+  "version": "1.0.0",
+  "description": "Helping pet owners find safe, compatible doggy playdates.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kamast1800/PawPals.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Kamast1800/PawPals/issues"
+  },
+  "homepage": "https://github.com/Kamast1800/PawPals#readme"
+}

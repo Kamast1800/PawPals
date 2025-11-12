@@ -12,3 +12,12 @@ node_modules/
 /.vite/
 /.turbo/
 /.parcel-cache/
+
+# API envs
+api/.env
+api/.env.example
+
+# Client envs
+client/.env
+client/.env.local
+client/.env.*.local
