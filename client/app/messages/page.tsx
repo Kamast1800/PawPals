@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 // Mock data - replace with actual data from your API
@@ -9,7 +9,8 @@ const mockPets = [
   { id: '2', name: 'Luna', breed: 'Siamese', image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba' },
 ];
 
-export default function MessagesPage() {
+// Client component that uses useSearchParams
+function MessagesContent() {
   const searchParams = useSearchParams();
   const [showNewMatch, setShowNewMatch] = useState(false);
   const [matchedPet, setMatchedPet] = useState<{name: string, breed: string, image: string} | null>(null);
@@ -90,5 +91,13 @@ export default function MessagesPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div className="p-4">Loading messages...</div>}>
+      <MessagesContent />
+    </Suspense>
   );
 }
