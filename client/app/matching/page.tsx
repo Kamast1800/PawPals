@@ -82,12 +82,25 @@ export default function MatchingPage() {
     
     // Simulate API call for like/dislike
     setTimeout(() => {
+      if (dir === 1) { // Right swipe (like)
+        // In a real app, you would make an API call here to check for a match
+        // For now, we'll simulate a match with a 30% chance
+        const isMatch = Math.random() < 0.3;
+        
+        if (isMatch) {
+          // Redirect to messages with the matched pet's ID
+          window.location.href = `/messages?newMatch=${currentPet.id}`;
+          return;
+        }
+      }
+      
       if (currentIndex < pets.length - 1) {
         setCurrentIndex(currentIndex + 1);
       } else {
-        // Reset or handle end of list
+        // Reset to the first pet if we've reached the end
         setCurrentIndex(0);
       }
+      
       setIsAnimating(false);
     }, 300);
   };
@@ -95,7 +108,7 @@ export default function MatchingPage() {
   const handlers = useSwipeable({
     onSwipedLeft: () => handleSwipe(-1),
     onSwipedRight: () => handleSwipe(1),
-    preventDefaultTouchmoveEvent: true,
+    preventScrollOnSwipe: true,
     trackMouse: true
   });
 
