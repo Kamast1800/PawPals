@@ -4,13 +4,47 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSwipeable } from 'react-swipeable';
 
+// Types for pet data
+type PetTemperament = 'Friendly' | 'Energetic' | 'Calm' | 'Shy' | 'Playful' | 'Independent' | 'Affectionate' | 'Intelligent';
+type PetBehavior = 'Good with kids' | 'Good with other dogs' | 'Good with cats' | 'House trained' | 'Leash trained';
+
+interface Pet {
+  id: number;
+  name: string;
+  age: number;
+  breed: string;
+  image: string;
+  weight: string;
+  gender: string;
+  location: string;
+  description: string;
+  temperament: PetTemperament[];
+  behaviors: PetBehavior[];
+  medical: {
+    isVaccinated: boolean;
+    isNeutered: boolean;
+    medicalNotes: string[];
+  };
+}
+
 // Mock data - replace with actual data from your database
-const pets = [
+const pets: Pet[] = [
   {
     id: 1,
     name: 'Buddy',
     age: 2,
     breed: 'Golden Retriever',
+    weight: '65 lbs',
+    gender: 'Male',
+    location: 'Seattle, WA',
+    description: 'Buddy is a friendly and energetic companion who loves long walks and cuddles.',
+    temperament: ['Friendly', 'Energetic', 'Affectionate'],
+    behaviors: ['Good with kids', 'Good with other dogs', 'House trained', 'Leash trained'],
+    medical: {
+      isVaccinated: true,
+      isNeutered: true,
+      medicalNotes: ['Up to date on all shots', 'Microchipped']
+    },
     image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
   },
   {
@@ -18,9 +52,19 @@ const pets = [
     name: 'Luna',
     age: 3,
     breed: 'Siamese',
+    weight: '8 lbs',
+    gender: 'Female',
+    location: 'Portland, OR',
+    description: 'Luna is a gentle and independent cat who enjoys sunny spots and quiet evenings.',
+    temperament: ['Calm', 'Independent', 'Affectionate'],
+    behaviors: ['Good with kids', 'Good with other dogs', 'House trained'],
+    medical: {
+      isVaccinated: true,
+      isNeutered: true,
+      medicalNotes: ['Spayed', 'Microchipped']
+    },
     image: 'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1443&q=80',
   },
-  // Add more pets as needed
 ];
 
 export default function MatchingPage() {
@@ -86,10 +130,62 @@ export default function MatchingPage() {
                 className="w-full h-full bg-cover bg-center"
                 style={{ backgroundImage: `url(${currentPet.image})` }}
               >
-                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent text-white">
-                  <h2 className="text-3xl font-bold">{currentPet.name}</h2>
-                  <p className="text-lg">{currentPet.breed}</p>
-                  <p className="text-lg">{currentPet.age} years old</p>
+                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/70 to-transparent text-white">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h2 className="text-3xl font-bold">{currentPet.name} <span className="text-xl font-normal">{currentPet.gender} • {currentPet.age} years</span></h2>
+                      <p className="text-lg">{currentPet.breed} • {currentPet.weight}</p>
+                      <p className="text-sm opacity-90 mt-1">📍 {currentPet.location}</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          currentPet.medical.isVaccinated ? 'bg-green-500' : 'bg-yellow-500'}`}>
+                          {currentPet.medical.isVaccinated ? 'Vaccinated' : 'Vaccination Needed'}
+                        </span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          currentPet.medical.isNeutered ? 'bg-blue-500' : 'bg-purple-500'}`}>
+                          {currentPet.medical.isNeutered ? 'Neutered/Spayed' : 'Not Neutered'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-3">
+                    <p className="text-sm mb-2">{currentPet.description}</p>
+                    
+                    <div className="flex flex-wrap gap-1.5 mt-2 mb-3">
+                      {currentPet.temperament.map((trait) => (
+                        <span key={trait} className="px-2 py-1 bg-white/20 rounded-full text-xs">
+                          {trait}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {currentPet.behaviors.map((behavior) => (
+                        <span key={behavior} className="px-2 py-1 bg-green-500/30 rounded-full text-xs flex items-center">
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          {behavior}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    {currentPet.medical.medicalNotes.length > 0 && (
+                      <div className="mt-3 pt-2 border-t border-white/20">
+                        <h4 className="text-xs font-semibold mb-1">MEDICAL NOTES</h4>
+                        <ul className="text-xs space-y-1">
+                          {currentPet.medical.medicalNotes.map((note, index) => (
+                            <li key={index} className="flex items-start">
+                              <span className="mr-1">•</span> {note}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
