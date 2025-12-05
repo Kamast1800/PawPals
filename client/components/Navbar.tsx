@@ -2,22 +2,23 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MessageSquare, Heart, User } from 'lucide-react';
+import { Home, MessageSquare, Heart, User, Calendar } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
 
   const navItems = [
-    { name: 'Home', path: '/', icon: <Home size={24} /> },
-    { name: 'Match', path: '/matching', icon: <Heart size={24} /> },
-    { name: 'Messages', path: '/messages', icon: <MessageSquare size={24} /> },
-    { name: 'Profile', path: '/profile', icon: <User size={24} /> },
+    { name: 'Home', path: '/', icon: <Home size={20} /> },
+    { name: 'Match', path: '/matching', icon: <Heart size={20} /> },
+    { name: 'Playdates', path: '/playdates', icon: <Calendar size={20} /> },
+    { name: 'Messages', path: '/messages', icon: <MessageSquare size={20} /> },
+    { name: 'Profile', path: '/profile', icon: <User size={20} /> },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-      <div className="max-w-md mx-auto px-4">
-        <div className="flex justify-around items-center h-16">
+      <div className="max-w-md mx-auto px-2">
+        <div className="flex justify-between items-center h-16">
           {navItems.map((item) => (
             <Link
               key={item.path}
