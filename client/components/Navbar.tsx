@@ -23,7 +23,7 @@ export default function Navbar() {
               key={item.path}
               href={item.path}
               className={`flex flex-col items-center justify-center w-full h-full py-2 transition-colors ${
-                pathname === item.path ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700'
+                pathname === item.path ? 'text-indigo-300' : 'text-gray-200 hover:text-white'
               }`}
             >
               <span className="mb-1">
