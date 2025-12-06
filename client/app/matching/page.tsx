@@ -51,7 +51,7 @@ export default function MatchingPage() {
   const handlers = useSwipeable({
     onSwipedLeft: () => handleSwipe(-1),
     onSwipedRight: () => handleSwipe(1),
-    preventDefaultTouchmoveEvent: true,
+    preventScrollOnSwipe: true,
     trackMouse: true
   });
 
