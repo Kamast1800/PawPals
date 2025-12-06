@@ -13,7 +13,6 @@ export default function Navbar() {
     { name: 'Match', path: '/matching', icon: <Heart size={20} /> },
     { name: 'Playdates', path: '/playdates', icon: <Calendar size={20} /> },
     { name: 'Messages', path: '/messages', icon: <MessageSquare size={20} /> },
-    { name: 'Profile', path: '/profile', icon: <User size={20} /> },
   ];
 
   return (

@@ -7,21 +7,25 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "test": "jest"
+    "test": "jest",
+    "deploy": "serverless deploy"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
+    "client-secrets-manager": "github:aws-sdk/client-secrets-manager",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-validator": "^7.0.1",
     "helmet": "^7.1.0",
     "http-status-codes": "^2.2.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "serverless-http": "^4.0.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
     "nodemon": "^3.0.1",
+    "serverless": "^4.27.0",
     "supertest": "^6.3.3"
   }
 }
