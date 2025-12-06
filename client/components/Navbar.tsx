@@ -3,14 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, MessageSquare, Heart, User, Calendar } from 'lucide-react';
+import { Heart, Calendar, MessageSquare } from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
 
   const navItems = [
-    { name: 'Home', path: '/', icon: <Home size={20} /> },
-    { name: 'Match', path: '/matching', icon: <Heart size={20} /> },
+    { name: 'Match', path: '/', icon: <Heart size={20} /> },
     { name: 'Playdates', path: '/playdates', icon: <Calendar size={20} /> },
     { name: 'Messages', path: '/messages', icon: <MessageSquare size={20} /> },
   ];
