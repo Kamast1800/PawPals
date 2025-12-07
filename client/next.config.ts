@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Disable Turbopack by not enabling the experimental flag
+  // and using the default webpack configuration
+  experimental: {
+    // Add any experimental features here if needed
+  }
 };
 
 export default nextConfig;
