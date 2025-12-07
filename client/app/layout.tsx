@@ -16,12 +16,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <main className="pb-16 min-h-screen">
+    <html lang="en" className="h-full">
+      <body className={`${inter.className} min-h-screen bg-white text-gray-900`}>
+        <div className="sticky top-0 z-50">
+          <Navbar />
+        </div>
+        <main className="flex-grow">
           {children}
         </main>
-        <Navbar />
       </body>
     </html>
   );
