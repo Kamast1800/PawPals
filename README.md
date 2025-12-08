@@ -27,3 +27,5 @@ Scaffold and run services (to be added in subsequent commits):
 - **Client**: Vite React PWA
 - **API**: Express server
 - **Supabase**: SQL migrations and seeds
+
+Access the app at https://main.d3d605coiesa90.amplifyapp.com/
