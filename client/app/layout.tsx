@@ -17,13 +17,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="h-full">
-      <body className={`${inter.className} min-h-screen bg-white text-gray-900`}>
-        <div className="sticky top-0 z-50">
-          <Navbar />
+      <body className={inter.className}>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 text-gray-900">
+          <main>
+            {children}
+          </main>
         </div>
-        <main className="flex-grow">
-          {children}
-        </main>
       </body>
     </html>
   );
